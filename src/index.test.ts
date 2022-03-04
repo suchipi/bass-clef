@@ -81,3 +81,16 @@ test("null and undefined with String hint", () => {
     }
   `);
 });
+
+test("empty string arg", () => {
+  const result = parseArgv([""]);
+
+  expect(result).toMatchInlineSnapshot(`
+    {
+      "options": {},
+      "positionalArgs": [
+        "",
+      ],
+    }
+  `);
+});

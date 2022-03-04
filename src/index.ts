@@ -12,7 +12,7 @@ export function parseArgv(
   let isAfterDoubleDash = false;
   while (argv.length > 0) {
     let item = argv.shift();
-    if (!item) break;
+    if (item == null) break;
 
     if (item === "--") {
       isAfterDoubleDash = true;
