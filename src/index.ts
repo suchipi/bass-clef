@@ -30,7 +30,7 @@ export function parseArgv(
         } else {
           if (!item.startsWith("--")) {
             throw new Error(
-              `Invalid command-line flag: '${item}'. Single-character command-line flags should only have one dash before them, and multi-character command-line flags should have two dashes before them.`
+              `Invalid command-line flag: '${item}'. Single-character command-line flags should only have one dash before them, and multi-character command-line flags should have two dashes before them. If you want to pass '${item}' as a positional argument, place it after a '--'.`
             );
           }
           propertyName = changeCase.camelCase(item.replace(/^--/, ""));
