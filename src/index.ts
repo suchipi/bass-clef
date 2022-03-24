@@ -1,11 +1,31 @@
+import path from "path";
 import * as changeCase from "change-case";
+
+export const Path = Symbol("Path");
+
+export type Hint = typeof String | typeof Boolean | typeof Number | typeof Path;
+
+function bestGuess(nextValue: string | undefined): Hint {
+  if (nextValue === "true" || nextValue === "false") {
+    return Boolean;
+  } else if (nextValue == null || nextValue.startsWith("-")) {
+    return Boolean;
+  } else if (nextValue === String(Number(nextValue))) {
+    return Number;
+  } else {
+    return String;
+  }
+}
 
 export function parseArgv(
   argv: Array<string> = process.argv.slice(2),
   hints: {
-    [key: string]: StringConstructor | BooleanConstructor | NumberConstructor;
+    [key: string]: Hint | undefined | null;
   } = {}
-) {
+): {
+  options: any;
+  positionalArgs: Array<string>;
+} {
   const options: any = {};
   const positionalArgs: Array<any> = [];
 
@@ -36,35 +56,52 @@ export function parseArgv(
           propertyName = changeCase.camelCase(item.replace(/^--/, ""));
         }
 
-        let propertyValue: string | number | boolean | null | undefined;
-        const propertyHint = hints[propertyName];
+        let propertyValue: string | number | boolean;
+        let propertyHint = hints[propertyName];
 
         const nextValue = argv[0];
 
-        if (nextValue === "true" || nextValue === "false") {
-          argv.shift();
-          propertyValue = nextValue === "true";
-        } else if (
-          propertyHint === Boolean ||
-          nextValue == null ||
-          nextValue.startsWith("-")
-        ) {
-          propertyValue = true;
-        } else if (nextValue === "null") {
-          argv.shift();
-          propertyValue = null;
-        } else if (nextValue === "undefined") {
-          argv.shift();
-          propertyValue = undefined;
-        } else if (
-          propertyHint === Number ||
-          (propertyHint == null && nextValue === String(Number(nextValue)))
-        ) {
-          argv.shift();
-          propertyValue = Number(nextValue);
-        } else {
-          argv.shift();
-          propertyValue = nextValue;
+        if (propertyHint == null) {
+          propertyHint = bestGuess(nextValue);
+        }
+
+        switch (propertyHint) {
+          case Boolean: {
+            if (nextValue === "false") {
+              argv.shift();
+              propertyValue = false;
+            } else {
+              if (nextValue === "true") {
+                argv.shift();
+              }
+              propertyValue = true;
+            }
+            break;
+          }
+
+          case Number: {
+            argv.shift();
+            propertyValue = Number(nextValue);
+            break;
+          }
+
+          case String: {
+            argv.shift();
+            propertyValue = nextValue;
+            break;
+          }
+
+          case Path: {
+            argv.shift();
+            propertyValue = path.isAbsolute(nextValue)
+              ? nextValue
+              : path.resolve(process.cwd(), nextValue);
+            break;
+          }
+
+          default: {
+            throw new Error(`Invalid option hint: ${propertyHint}`);
+          }
         }
 
         options[propertyName] = propertyValue;

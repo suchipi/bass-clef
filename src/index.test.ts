@@ -1,5 +1,5 @@
 import { test, expect } from "vitest";
-import { parseArgv } from "./index";
+import { parseArgv, Path } from "./index";
 
 test("basic test", () => {
   const result = parseArgv(["-v", "--some-flag", "52", "potato", "--", "--hi"]);
@@ -53,11 +53,12 @@ test("number hint", () => {
 test("null and undefined", () => {
   const result = parseArgv(["--first", "null", "--second", "undefined"]);
 
+  // They get treated as strings.
   expect(result).toMatchInlineSnapshot(`
     {
       "options": {
-        "first": null,
-        "second": undefined,
+        "first": "null",
+        "second": "undefined",
       },
       "positionalArgs": [],
     }
@@ -70,13 +71,23 @@ test("null and undefined with String hint", () => {
     secong: String,
   });
 
-  // I guess this is fine?
   expect(result).toMatchInlineSnapshot(`
     {
       "options": {
-        "first": null,
-        "second": undefined,
+        "first": "null",
+        "second": "undefined",
       },
+      "positionalArgs": [],
+    }
+  `);
+});
+
+test("empty", () => {
+  const result = parseArgv([]);
+
+  expect(result).toMatchInlineSnapshot(`
+    {
+      "options": {},
       "positionalArgs": [],
     }
   `);
@@ -93,4 +104,133 @@ test("empty string arg", () => {
       ],
     }
   `);
+});
+
+test("path hint (./)", () => {
+  const normalCwd = process.cwd;
+  Object.defineProperty(process, "cwd", { value: () => "/some/fake/path" });
+
+  try {
+    const result = parseArgv(
+      [
+        "--first-thing",
+        "./blah",
+        "--second-thing",
+        "./blah",
+        "--third-thing",
+        "./blah",
+      ],
+      { firstThing: String, secondThing: Path }
+    );
+
+    expect(result).toMatchInlineSnapshot(`
+      {
+        "options": {
+          "firstThing": "./blah",
+          "secondThing": "/some/fake/path/blah",
+          "thirdThing": "./blah",
+        },
+        "positionalArgs": [],
+      }
+    `);
+  } finally {
+    Object.defineProperty(process, "cwd", { value: normalCwd });
+  }
+});
+
+test("path hint (../)", () => {
+  const normalCwd = process.cwd;
+  Object.defineProperty(process, "cwd", { value: () => "/some/fake/path" });
+
+  try {
+    const result = parseArgv(
+      [
+        "--first-thing",
+        "../blah",
+        "--second-thing",
+        "../blah",
+        "--third-thing",
+        "../blah",
+      ],
+      { firstThing: String, secondThing: Path }
+    );
+
+    expect(result).toMatchInlineSnapshot(`
+      {
+        "options": {
+          "firstThing": "../blah",
+          "secondThing": "/some/fake/blah",
+          "thirdThing": "../blah",
+        },
+        "positionalArgs": [],
+      }
+    `);
+  } finally {
+    Object.defineProperty(process, "cwd", { value: normalCwd });
+  }
+});
+
+test("path hint (unqualified input)", () => {
+  const normalCwd = process.cwd;
+  Object.defineProperty(process, "cwd", { value: () => "/some/fake/path" });
+
+  try {
+    const result = parseArgv(
+      [
+        "--first-thing",
+        "blah",
+        "--second-thing",
+        "blah",
+        "--third-thing",
+        "blah",
+      ],
+      { firstThing: String, secondThing: Path }
+    );
+
+    expect(result).toMatchInlineSnapshot(`
+      {
+        "options": {
+          "firstThing": "blah",
+          "secondThing": "/some/fake/path/blah",
+          "thirdThing": "blah",
+        },
+        "positionalArgs": [],
+      }
+    `);
+  } finally {
+    Object.defineProperty(process, "cwd", { value: normalCwd });
+  }
+});
+
+test("relative path without hint specified", () => {
+  const normalCwd = process.cwd;
+  Object.defineProperty(process, "cwd", { value: () => "/some/fake/path" });
+
+  try {
+    const result = parseArgv(
+      [
+        "--first-thing",
+        "blah",
+        "--second-thing",
+        "./blah",
+        "--third-thing",
+        "../blah",
+      ],
+      {}
+    );
+
+    // You can only make a path via hint.
+    expect(result).toMatchInlineSnapshot(`
+      {
+        "options": {
+          "firstThing": "blah",
+          "secondThing": "./blah",
+          "thirdThing": "../blah",
+        },
+        "positionalArgs": [],
+      }
+    `);
+  } finally {
+    Object.defineProperty(process, "cwd", { value: normalCwd });
+  }
 });
