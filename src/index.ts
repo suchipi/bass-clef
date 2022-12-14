@@ -1,5 +1,5 @@
 import path from "path";
-import * as changeCase from "change-case";
+import { convertToCamelCase } from "./convert-case";
 
 export const Path = Symbol("Path");
 
@@ -21,6 +21,15 @@ export function parseArgv(
   argv: Array<string> = process.argv.slice(2),
   hints: {
     [key: string]: Hint | undefined | null;
+  } = {},
+  {
+    isAbsolute = path.isAbsolute,
+    resolvePath = path.resolve,
+    getCwd = process.cwd,
+  }: {
+    isAbsolute?: (somePath: string) => boolean;
+    resolvePath?: (...parts: Array<string>) => string;
+    getCwd?: () => string;
   } = {}
 ): {
   options: any;
@@ -53,7 +62,7 @@ export function parseArgv(
               `Invalid command-line flag: '${item}'. Single-character command-line flags should only have one dash before them, and multi-character command-line flags should have two dashes before them. If you want to pass '${item}' as a positional argument, place it after a '--'.`
             );
           }
-          propertyName = changeCase.camelCase(item.replace(/^--/, ""));
+          propertyName = convertToCamelCase(item.replace(/^--/, ""));
         }
 
         let propertyValue: string | number | boolean;
@@ -93,9 +102,9 @@ export function parseArgv(
 
           case Path: {
             argv.shift();
-            propertyValue = path.isAbsolute(nextValue)
+            propertyValue = isAbsolute(nextValue)
               ? nextValue
-              : path.resolve(process.cwd(), nextValue);
+              : resolvePath(getCwd(), nextValue);
             break;
           }
 

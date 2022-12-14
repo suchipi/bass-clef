@@ -29,8 +29,5 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/suchipi/clef-parse.git"
-  },
-  "dependencies": {
-    "change-case": "^4.1.2"
   }
 }
