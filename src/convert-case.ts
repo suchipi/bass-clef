@@ -1,6 +1,6 @@
 export function convertToCamelCase(input: string): string {
   const parts = input
-    .split(/\b/g)
+    .split(/\b|_/g)
     .map((part) => part.toLowerCase())
     .filter((part) => /[A-Za-z0-9]/.test(part));
 

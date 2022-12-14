@@ -18,6 +18,23 @@ test("basic test", () => {
   `);
 });
 
+test("basic test (underscores in property names)", () => {
+  const result = parseArgv(["-v", "--some_flag", "52", "potato", "--", "--hi"]);
+
+  expect(result).toMatchInlineSnapshot(`
+    {
+      "options": {
+        "someFlag": 52,
+        "v": true,
+      },
+      "positionalArgs": [
+        "potato",
+        "--hi",
+      ],
+    }
+  `);
+});
+
 test("boolean hint", () => {
   const result = parseArgv(["-v", "potato"], { v: Boolean });
 
