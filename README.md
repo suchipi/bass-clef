@@ -88,7 +88,35 @@ $ clef-parse one two --three-four=five
 }
 ```
 
-You can't specify hints with the CLI tool.
+To specify hints with the CLI tool, use environment variables named like `CLEF_PARSE_HINT_<option name goes here>`. For instance:
+
+```sh
+# Without any hints specified, --with-batteries is parsed as a string:
+$ clef-parse some stuff --with-batteries yeah yup
+{
+  "options": {
+    "withBatteries": "yeah"
+  },
+  "positionalArgs": [
+    "some",
+    "stuff",
+    "yup"
+  ]
+}
+# But specifying the hint as boolean treats the next value as a positional arg:
+$ env CLEF_PARSE_HINT_WITH_BATTERIES=Boolean clef-parse some stuff --with-batteries yeah yup
+{
+  "options": {
+    "withBatteries": true
+  },
+  "positionalArgs": [
+    "some",
+    "stuff",
+    "yeah",
+    "yup"
+  ]
+}
+```
 
 ## License
 
