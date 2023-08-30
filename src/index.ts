@@ -17,6 +17,26 @@ function bestGuess(nextValue: string | undefined): Hint {
   }
 }
 
+function hintToString(hint: Hint): string {
+  switch (hint) {
+    case String: {
+      return "string";
+    }
+    case Boolean: {
+      return "boolean";
+    }
+    case Number: {
+      return "number";
+    }
+    case Path: {
+      return "path";
+    }
+    default: {
+      throw new Error("Invalid hint: " + hint);
+    }
+  }
+}
+
 export function parseArgv(
   argv: Array<string> = process.argv.slice(2),
   hints: {
@@ -35,12 +55,22 @@ export function parseArgv(
   options: { [key: string]: any };
   positionalArgs: Array<string>;
   metadata: {
-    optionNames: { [key: string]: string | undefined };
+    keys: { [key: string]: string | undefined };
+    hints: { [key: string]: string | undefined };
+    guesses: { [key: string]: string | undefined };
   };
 } {
   const options: { [key: string]: any } = {};
-  const optionNames: { [key: string]: string | undefined } = {};
   const positionalArgs: Array<any> = [];
+  const metadata: {
+    keys: { [key: string]: string | undefined };
+    hints: { [key: string]: string };
+    guesses: { [key: string]: string };
+  } = {
+    keys: {},
+    hints: {},
+    guesses: {},
+  };
 
   let isAfterDoubleDash = false;
   while (argv.length > 0) {
@@ -65,12 +95,12 @@ export function parseArgv(
           const before = item.slice(0, equalsOffset);
           const after = item.slice(equalsOffset + 1);
           propertyName = convertToCamelCase(before);
-          optionNames[before] = propertyName;
+          metadata.keys[before] = propertyName;
           rightHandValue = after;
           valueComesFromNextArg = false;
         } else {
           propertyName = convertToCamelCase(item);
-          optionNames[item] = propertyName;
+          metadata.keys[item] = propertyName;
           rightHandValue = argv[0];
           valueComesFromNextArg = true;
         }
@@ -80,6 +110,9 @@ export function parseArgv(
 
         if (propertyHint == null) {
           propertyHint = bestGuess(rightHandValue);
+          metadata.guesses[propertyName] = hintToString(propertyHint);
+        } else {
+          metadata.hints[propertyName] = hintToString(propertyHint);
         }
 
         switch (propertyHint) {
@@ -138,5 +171,9 @@ export function parseArgv(
     }
   }
 
-  return { options, positionalArgs, metadata: { optionNames } };
+  return {
+    options,
+    positionalArgs,
+    metadata,
+  };
 }

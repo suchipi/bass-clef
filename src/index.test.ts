@@ -7,7 +7,12 @@ test("basic test", () => {
   expect(result).toMatchInlineSnapshot(`
     {
       "metadata": {
-        "optionNames": {
+        "guesses": {
+          "someFlag": "number",
+          "v": "boolean",
+        },
+        "hints": {},
+        "keys": {
           "--some-flag": "someFlag",
           "-v": "v",
         },
@@ -30,7 +35,12 @@ test("basic test (underscores in property names)", () => {
   expect(result).toMatchInlineSnapshot(`
     {
       "metadata": {
-        "optionNames": {
+        "guesses": {
+          "someFlag": "number",
+          "v": "boolean",
+        },
+        "hints": {},
+        "keys": {
           "--some_flag": "someFlag",
           "-v": "v",
         },
@@ -53,7 +63,11 @@ test("boolean hint", () => {
   expect(result).toMatchInlineSnapshot(`
     {
       "metadata": {
-        "optionNames": {
+        "guesses": {},
+        "hints": {
+          "v": "boolean",
+        },
+        "keys": {
           "-v": "v",
         },
       },
@@ -76,7 +90,12 @@ test("number hint", () => {
   expect(result).toMatchInlineSnapshot(`
     {
       "metadata": {
-        "optionNames": {
+        "guesses": {},
+        "hints": {
+          "anotherNum": "number",
+          "someNum": "number",
+        },
+        "keys": {
           "--another-num": "anotherNum",
           "--some-num": "someNum",
         },
@@ -97,7 +116,12 @@ test("null and undefined", () => {
   expect(result).toMatchInlineSnapshot(`
     {
       "metadata": {
-        "optionNames": {
+        "guesses": {
+          "first": "string",
+          "second": "string",
+        },
+        "hints": {},
+        "keys": {
           "--first": "first",
           "--second": "second",
         },
@@ -120,7 +144,13 @@ test("null and undefined with String hint", () => {
   expect(result).toMatchInlineSnapshot(`
     {
       "metadata": {
-        "optionNames": {
+        "guesses": {
+          "second": "string",
+        },
+        "hints": {
+          "first": "string",
+        },
+        "keys": {
           "--first": "first",
           "--second": "second",
         },
@@ -140,7 +170,9 @@ test("empty", () => {
   expect(result).toMatchInlineSnapshot(`
     {
       "metadata": {
-        "optionNames": {},
+        "guesses": {},
+        "hints": {},
+        "keys": {},
       },
       "options": {},
       "positionalArgs": [],
@@ -154,7 +186,9 @@ test("empty string arg", () => {
   expect(result).toMatchInlineSnapshot(`
     {
       "metadata": {
-        "optionNames": {},
+        "guesses": {},
+        "hints": {},
+        "keys": {},
       },
       "options": {},
       "positionalArgs": [
@@ -181,7 +215,14 @@ test("path hint (./)", () => {
   expect(result).toMatchInlineSnapshot(`
     {
       "metadata": {
-        "optionNames": {
+        "guesses": {
+          "thirdThing": "string",
+        },
+        "hints": {
+          "firstThing": "string",
+          "secondThing": "path",
+        },
+        "keys": {
           "--first-thing": "firstThing",
           "--second-thing": "secondThing",
           "--third-thing": "thirdThing",
@@ -214,7 +255,14 @@ test("path hint (../)", () => {
   expect(result).toMatchInlineSnapshot(`
     {
       "metadata": {
-        "optionNames": {
+        "guesses": {
+          "thirdThing": "string",
+        },
+        "hints": {
+          "firstThing": "string",
+          "secondThing": "path",
+        },
+        "keys": {
           "--first-thing": "firstThing",
           "--second-thing": "secondThing",
           "--third-thing": "thirdThing",
@@ -247,7 +295,14 @@ test("path hint (unqualified input)", () => {
   expect(result).toMatchInlineSnapshot(`
     {
       "metadata": {
-        "optionNames": {
+        "guesses": {
+          "thirdThing": "string",
+        },
+        "hints": {
+          "firstThing": "string",
+          "secondThing": "path",
+        },
+        "keys": {
           "--first-thing": "firstThing",
           "--second-thing": "secondThing",
           "--third-thing": "thirdThing",
@@ -281,7 +336,13 @@ test("relative path without hint specified", () => {
   expect(result).toMatchInlineSnapshot(`
     {
       "metadata": {
-        "optionNames": {
+        "guesses": {
+          "firstThing": "string",
+          "secondThing": "string",
+          "thirdThing": "string",
+        },
+        "hints": {},
+        "keys": {
           "--first-thing": "firstThing",
           "--second-thing": "secondThing",
           "--third-thing": "thirdThing",
@@ -303,7 +364,12 @@ test("single-dash multi-char property name", () => {
   expect(result).toMatchInlineSnapshot(`
     {
       "metadata": {
-        "optionNames": {
+        "guesses": {
+          "help": "string",
+          "version": "boolean",
+        },
+        "hints": {},
+        "keys": {
           "-help": "help",
           "-version": "version",
         },
@@ -331,7 +397,15 @@ test("property name and value in one arg separated by equals", () => {
   expect(result).toMatchInlineSnapshot(`
     {
       "metadata": {
-        "optionNames": {
+        "guesses": {
+          "anotherThing": "string",
+          "noEquals": "string",
+          "s": "number",
+          "something": "boolean",
+          "withoutEquals": "string",
+        },
+        "hints": {},
+        "keys": {
           "--another_thing": "anotherThing",
           "--no-equals": "noEquals",
           "--something": "something",
@@ -365,7 +439,13 @@ test("example: ffmpeg argv", () => {
   expect(result).toMatchInlineSnapshot(`
     {
       "metadata": {
-        "optionNames": {
+        "guesses": {
+          "cV": "string",
+          "crf": "number",
+          "i": "string",
+        },
+        "hints": {},
+        "keys": {
           "-c:v": "cV",
           "-crf": "crf",
           "-i": "i",
