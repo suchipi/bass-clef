@@ -227,3 +227,42 @@ test("relative path without hint specified", () => {
       }
     `);
 });
+
+test("single-dash multi-char property name", () => {
+  const result = parseArgv(["-version", "-help", "yeah"]);
+
+  expect(result).toMatchInlineSnapshot(`
+    {
+      "options": {
+        "help": "yeah",
+        "version": true,
+      },
+      "positionalArgs": [],
+    }
+  `);
+});
+
+test("property name and value in one arg separated by equals", () => {
+  const result = parseArgv([
+    "-s=1",
+    "--something=true",
+    "--no-equals",
+    "here",
+    "--another_thing=yup",
+    "--without-equals",
+    "again",
+  ]);
+
+  expect(result).toMatchInlineSnapshot(`
+    {
+      "options": {
+        "anotherThing": "yup",
+        "noEquals": "here",
+        "s": 1,
+        "something": true,
+        "withoutEquals": "again",
+      },
+      "positionalArgs": [],
+    }
+  `);
+});

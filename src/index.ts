@@ -52,36 +52,44 @@ export function parseArgv(
       if (isAfterDoubleDash) {
         positionalArgs.push(item);
       } else {
-        let propertyName: string;
+        const itemWithoutLeadingDashes = item.replace(/^-{1,2}/, "");
 
-        if (item.length === 2) {
-          propertyName = item[1];
+        let propertyName: string;
+        let rightHandValue: string | undefined;
+        let valueComesFromNextArg: boolean;
+
+        if (/=/.test(itemWithoutLeadingDashes)) {
+          let equalsOffset = itemWithoutLeadingDashes.indexOf("=");
+          const before = itemWithoutLeadingDashes.slice(0, equalsOffset);
+          const after = itemWithoutLeadingDashes.slice(equalsOffset + 1);
+          propertyName = convertToCamelCase(before);
+          rightHandValue = after;
+          valueComesFromNextArg = false;
         } else {
-          if (!item.startsWith("--")) {
-            throw new Error(
-              `Invalid command-line flag: '${item}'. Single-character command-line flags should only have one dash before them, and multi-character command-line flags should have two dashes before them. If you want to pass '${item}' as a positional argument, place it after a '--'.`
-            );
-          }
-          propertyName = convertToCamelCase(item.replace(/^--/, ""));
+          propertyName = convertToCamelCase(itemWithoutLeadingDashes);
+          rightHandValue = argv[0];
+          valueComesFromNextArg = true;
         }
 
         let propertyValue: string | number | boolean;
         let propertyHint = hints[propertyName];
 
-        const nextValue = argv[0];
-
         if (propertyHint == null) {
-          propertyHint = bestGuess(nextValue);
+          propertyHint = bestGuess(rightHandValue);
         }
 
         switch (propertyHint) {
           case Boolean: {
-            if (nextValue === "false") {
-              argv.shift();
+            if (rightHandValue === "false") {
+              if (valueComesFromNextArg) {
+                argv.shift();
+              }
               propertyValue = false;
             } else {
-              if (nextValue === "true") {
-                argv.shift();
+              if (rightHandValue === "true") {
+                if (valueComesFromNextArg) {
+                  argv.shift();
+                }
               }
               propertyValue = true;
             }
@@ -89,22 +97,28 @@ export function parseArgv(
           }
 
           case Number: {
-            argv.shift();
-            propertyValue = Number(nextValue);
+            if (valueComesFromNextArg) {
+              argv.shift();
+            }
+            propertyValue = Number(rightHandValue);
             break;
           }
 
           case String: {
-            argv.shift();
-            propertyValue = nextValue;
+            if (valueComesFromNextArg) {
+              argv.shift();
+            }
+            propertyValue = rightHandValue;
             break;
           }
 
           case Path: {
-            argv.shift();
-            propertyValue = isAbsolute(nextValue)
-              ? nextValue
-              : resolvePath(getCwd(), nextValue);
+            if (valueComesFromNextArg) {
+              argv.shift();
+            }
+            propertyValue = isAbsolute(rightHandValue)
+              ? rightHandValue
+              : resolvePath(getCwd(), rightHandValue);
             break;
           }
 
