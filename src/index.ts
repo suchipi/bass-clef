@@ -32,10 +32,14 @@ export function parseArgv(
     getCwd?: () => string;
   } = {}
 ): {
-  options: any;
+  options: { [key: string]: any };
   positionalArgs: Array<string>;
+  metadata: {
+    optionNames: { [key: string]: string | undefined };
+  };
 } {
-  const options: any = {};
+  const options: { [key: string]: any } = {};
+  const optionNames: { [key: string]: string | undefined } = {};
   const positionalArgs: Array<any> = [];
 
   let isAfterDoubleDash = false;
@@ -52,21 +56,21 @@ export function parseArgv(
       if (isAfterDoubleDash) {
         positionalArgs.push(item);
       } else {
-        const itemWithoutLeadingDashes = item.replace(/^-{1,2}/, "");
-
         let propertyName: string;
         let rightHandValue: string | undefined;
         let valueComesFromNextArg: boolean;
 
-        if (/=/.test(itemWithoutLeadingDashes)) {
-          let equalsOffset = itemWithoutLeadingDashes.indexOf("=");
-          const before = itemWithoutLeadingDashes.slice(0, equalsOffset);
-          const after = itemWithoutLeadingDashes.slice(equalsOffset + 1);
+        if (/=/.test(item)) {
+          let equalsOffset = item.indexOf("=");
+          const before = item.slice(0, equalsOffset);
+          const after = item.slice(equalsOffset + 1);
           propertyName = convertToCamelCase(before);
+          optionNames[before] = propertyName;
           rightHandValue = after;
           valueComesFromNextArg = false;
         } else {
-          propertyName = convertToCamelCase(itemWithoutLeadingDashes);
+          propertyName = convertToCamelCase(item);
+          optionNames[item] = propertyName;
           rightHandValue = argv[0];
           valueComesFromNextArg = true;
         }
@@ -134,5 +138,5 @@ export function parseArgv(
     }
   }
 
-  return { options, positionalArgs };
+  return { options, positionalArgs, metadata: { optionNames } };
 }

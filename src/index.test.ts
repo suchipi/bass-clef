@@ -6,6 +6,12 @@ test("basic test", () => {
 
   expect(result).toMatchInlineSnapshot(`
     {
+      "metadata": {
+        "optionNames": {
+          "--some-flag": "someFlag",
+          "-v": "v",
+        },
+      },
       "options": {
         "someFlag": 52,
         "v": true,
@@ -23,6 +29,12 @@ test("basic test (underscores in property names)", () => {
 
   expect(result).toMatchInlineSnapshot(`
     {
+      "metadata": {
+        "optionNames": {
+          "--some_flag": "someFlag",
+          "-v": "v",
+        },
+      },
       "options": {
         "someFlag": 52,
         "v": true,
@@ -40,6 +52,11 @@ test("boolean hint", () => {
 
   expect(result).toMatchInlineSnapshot(`
     {
+      "metadata": {
+        "optionNames": {
+          "-v": "v",
+        },
+      },
       "options": {
         "v": true,
       },
@@ -58,6 +75,12 @@ test("number hint", () => {
 
   expect(result).toMatchInlineSnapshot(`
     {
+      "metadata": {
+        "optionNames": {
+          "--another-num": "anotherNum",
+          "--some-num": "someNum",
+        },
+      },
       "options": {
         "anotherNum": NaN,
         "someNum": 500,
@@ -73,6 +96,12 @@ test("null and undefined", () => {
   // They get treated as strings.
   expect(result).toMatchInlineSnapshot(`
     {
+      "metadata": {
+        "optionNames": {
+          "--first": "first",
+          "--second": "second",
+        },
+      },
       "options": {
         "first": "null",
         "second": "undefined",
@@ -90,6 +119,12 @@ test("null and undefined with String hint", () => {
 
   expect(result).toMatchInlineSnapshot(`
     {
+      "metadata": {
+        "optionNames": {
+          "--first": "first",
+          "--second": "second",
+        },
+      },
       "options": {
         "first": "null",
         "second": "undefined",
@@ -104,6 +139,9 @@ test("empty", () => {
 
   expect(result).toMatchInlineSnapshot(`
     {
+      "metadata": {
+        "optionNames": {},
+      },
       "options": {},
       "positionalArgs": [],
     }
@@ -115,6 +153,9 @@ test("empty string arg", () => {
 
   expect(result).toMatchInlineSnapshot(`
     {
+      "metadata": {
+        "optionNames": {},
+      },
       "options": {},
       "positionalArgs": [
         "",
@@ -138,15 +179,22 @@ test("path hint (./)", () => {
   );
 
   expect(result).toMatchInlineSnapshot(`
-      {
-        "options": {
-          "firstThing": "./blah",
-          "secondThing": "/some/fake/path/blah",
-          "thirdThing": "./blah",
+    {
+      "metadata": {
+        "optionNames": {
+          "--first-thing": "firstThing",
+          "--second-thing": "secondThing",
+          "--third-thing": "thirdThing",
         },
-        "positionalArgs": [],
-      }
-    `);
+      },
+      "options": {
+        "firstThing": "./blah",
+        "secondThing": "/some/fake/path/blah",
+        "thirdThing": "./blah",
+      },
+      "positionalArgs": [],
+    }
+  `);
 });
 
 test("path hint (../)", () => {
@@ -165,6 +213,13 @@ test("path hint (../)", () => {
 
   expect(result).toMatchInlineSnapshot(`
     {
+      "metadata": {
+        "optionNames": {
+          "--first-thing": "firstThing",
+          "--second-thing": "secondThing",
+          "--third-thing": "thirdThing",
+        },
+      },
       "options": {
         "firstThing": "../blah",
         "secondThing": "/some/fake/blah",
@@ -190,15 +245,22 @@ test("path hint (unqualified input)", () => {
   );
 
   expect(result).toMatchInlineSnapshot(`
-      {
-        "options": {
-          "firstThing": "blah",
-          "secondThing": "/some/fake/path/blah",
-          "thirdThing": "blah",
+    {
+      "metadata": {
+        "optionNames": {
+          "--first-thing": "firstThing",
+          "--second-thing": "secondThing",
+          "--third-thing": "thirdThing",
         },
-        "positionalArgs": [],
-      }
-    `);
+      },
+      "options": {
+        "firstThing": "blah",
+        "secondThing": "/some/fake/path/blah",
+        "thirdThing": "blah",
+      },
+      "positionalArgs": [],
+    }
+  `);
 });
 
 test("relative path without hint specified", () => {
@@ -217,15 +279,22 @@ test("relative path without hint specified", () => {
 
   // You can only make a path via hint.
   expect(result).toMatchInlineSnapshot(`
-      {
-        "options": {
-          "firstThing": "blah",
-          "secondThing": "./blah",
-          "thirdThing": "../blah",
+    {
+      "metadata": {
+        "optionNames": {
+          "--first-thing": "firstThing",
+          "--second-thing": "secondThing",
+          "--third-thing": "thirdThing",
         },
-        "positionalArgs": [],
-      }
-    `);
+      },
+      "options": {
+        "firstThing": "blah",
+        "secondThing": "./blah",
+        "thirdThing": "../blah",
+      },
+      "positionalArgs": [],
+    }
+  `);
 });
 
 test("single-dash multi-char property name", () => {
@@ -233,6 +302,12 @@ test("single-dash multi-char property name", () => {
 
   expect(result).toMatchInlineSnapshot(`
     {
+      "metadata": {
+        "optionNames": {
+          "-help": "help",
+          "-version": "version",
+        },
+      },
       "options": {
         "help": "yeah",
         "version": true,
@@ -255,6 +330,15 @@ test("property name and value in one arg separated by equals", () => {
 
   expect(result).toMatchInlineSnapshot(`
     {
+      "metadata": {
+        "optionNames": {
+          "--another_thing": "anotherThing",
+          "--no-equals": "noEquals",
+          "--something": "something",
+          "--without-equals": "withoutEquals",
+          "-s": "s",
+        },
+      },
       "options": {
         "anotherThing": "yup",
         "noEquals": "here",
@@ -263,6 +347,38 @@ test("property name and value in one arg separated by equals", () => {
         "withoutEquals": "again",
       },
       "positionalArgs": [],
+    }
+  `);
+});
+
+test("example: ffmpeg argv", () => {
+  const result = parseArgv([
+    // argv0 is "ffmpeg", so it would go here, but parseArgv doesn't expect argv0
+    "-i",
+    "demo.mov",
+    "-c:v",
+    "libx265",
+    "-crf",
+    "28",
+    "demo_out.mp4",
+  ]);
+  expect(result).toMatchInlineSnapshot(`
+    {
+      "metadata": {
+        "optionNames": {
+          "-c:v": "cV",
+          "-crf": "crf",
+          "-i": "i",
+        },
+      },
+      "options": {
+        "cV": "libx265",
+        "crf": 28,
+        "i": "demo.mov",
+      },
+      "positionalArgs": [
+        "demo_out.mp4",
+      ],
     }
   `);
 });
