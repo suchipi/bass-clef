@@ -230,7 +230,16 @@ test("path hint (./)", () => {
       },
       "options": {
         "firstThing": "./blah",
-        "secondThing": "/some/fake/path/blah",
+        "secondThing": Path {
+          "segments": [
+            "",
+            "some",
+            "fake",
+            "path",
+            "blah",
+          ],
+          "separator": "/",
+        },
         "thirdThing": "./blah",
       },
       "positionalArgs": [],
@@ -270,7 +279,15 @@ test("path hint (../)", () => {
       },
       "options": {
         "firstThing": "../blah",
-        "secondThing": "/some/fake/blah",
+        "secondThing": Path {
+          "segments": [
+            "",
+            "some",
+            "fake",
+            "blah",
+          ],
+          "separator": "/",
+        },
         "thirdThing": "../blah",
       },
       "positionalArgs": [],
@@ -310,7 +327,16 @@ test("path hint (unqualified input)", () => {
       },
       "options": {
         "firstThing": "blah",
-        "secondThing": "/some/fake/path/blah",
+        "secondThing": Path {
+          "segments": [
+            "",
+            "some",
+            "fake",
+            "path",
+            "blah",
+          ],
+          "separator": "/",
+        },
         "thirdThing": "blah",
       },
       "positionalArgs": [],

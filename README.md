@@ -33,7 +33,7 @@ const result2 = parseArgv(
     input: String,
     output: String,
     v: Boolean,
-  }
+  },
 );
 console.log(result2);
 // Logs:
@@ -42,10 +42,10 @@ console.log(result2);
 //   positionalArgs: []
 // }
 
-// Valid hints are Number, Boolean, String, or Path. Number, Boolean, and String are the standard JS globals, but Path is a value exported by the library:
+// Valid hints are Number, Boolean, String, or Path. Number, Boolean, and String are the standard JS globals, but Path is the class from the npm package "nice-path", which is re-exported by clef-parse:
 import { Path } from "clef-parse";
 
-// When you provide the Path hint, clef-parse will convert the input string into an absolute path:
+// When you provide the Path hint, clef-parse will interpret the input string as a path (relative to cwd unless it's absolute), and return a `Path` object. It will always be an absolute path.
 const result3 = parseArgv(
   ["--bundle", "--input", "index.js", "--output", "bundle.js", "-v"],
   {
@@ -53,15 +53,35 @@ const result3 = parseArgv(
     input: Path,
     output: Path,
     v: Boolean,
-  }
+  },
 );
 console.log(result3);
 // Logs (for example):
 // {
 //   options: {
 //     bundle: true,
-//     input: '/home/suchipi/Code/clef-parse/index.js',
-//     output: '/home/suchipi/Code/clef-parse/bundle.js',
+//     input: Path {
+//       segments: [
+//         "",
+//         "home",
+//         "suchipi",
+//         "Code",
+//         "clef-parse",
+//         "index.js",
+//       ],
+//       separator: "/",
+//     },
+//     output: Path {
+//       segments: [
+//         "",
+//         "home",
+//         "suchipi",
+//         "Code",
+//         "clef-parse",
+//         "bundle.js",
+//       ],
+//       separator: "/",
+//     },
 //     v: true
 //   },
 //   positionalArgs: []

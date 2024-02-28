@@ -1,9 +1,10 @@
 import path from "path";
+import { Path } from "nice-path";
 import { convertToCamelCase } from "./convert-case";
 
-export const Path = Symbol("Path");
-
 export type Hint = typeof String | typeof Boolean | typeof Number | typeof Path;
+
+export { Path };
 
 function bestGuess(nextValue: string | undefined): Hint {
   if (nextValue === "true" || nextValue === "false") {
@@ -50,7 +51,7 @@ export function parseArgv(
     isAbsolute?: (somePath: string) => boolean;
     resolvePath?: (...parts: Array<string>) => string;
     getCwd?: () => string;
-  } = {}
+  } = {},
 ): {
   options: { [key: string]: any };
   positionalArgs: Array<string>;
@@ -105,7 +106,7 @@ export function parseArgv(
           valueComesFromNextArg = true;
         }
 
-        let propertyValue: string | number | boolean;
+        let propertyValue: string | number | boolean | Path;
         let propertyHint = hints[propertyName];
 
         if (propertyHint == null) {
@@ -154,8 +155,8 @@ export function parseArgv(
               argv.shift();
             }
             propertyValue = isAbsolute(rightHandValue)
-              ? rightHandValue
-              : resolvePath(getCwd(), rightHandValue);
+              ? new Path(rightHandValue)
+              : new Path(resolvePath(getCwd(), rightHandValue));
             break;
           }
 

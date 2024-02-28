@@ -30,5 +30,8 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/suchipi/clef-parse.git"
+  },
+  "dependencies": {
+    "nice-path": "^2.0.0"
   }
 }
